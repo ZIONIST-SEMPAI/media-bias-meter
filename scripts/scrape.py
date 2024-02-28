@@ -3,10 +3,9 @@ import requests
 import mysql.connector
 from pynytimes import NYTAPI
 from bs4 import BeautifulSoup
-from dotenv import load_dotenv
 
 # load environment secrets from .env file
-load_dotenv()
+
 
 # retrieve environment variables
 API_KEY = os.getenv("API_KEY")
