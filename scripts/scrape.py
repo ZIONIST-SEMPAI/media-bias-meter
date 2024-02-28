@@ -1,8 +1,8 @@
 import os
 import requests
-import mysql.connector
 from pynytimes import NYTAPI
 from bs4 import BeautifulSoup
+import yaml
 
 # load environment secrets from .env file
 
@@ -91,6 +91,7 @@ def get_article_content(article_url: str) -> str:
       print("failed: snapshot not found - article has not been archived")
       return "No snapshot found"
 
+'''
 def save_to_db(article: dict):
 
   try: 
@@ -135,7 +136,7 @@ def save_to_db(article: dict):
   db.close()
 
   print(f"Article {article.get('headline')} saved to the database")
-
+'''
 
 
 
@@ -149,6 +150,5 @@ if __name__ == "__main__":
     article["body"] = get_article_content(article.get('web_url'))
 
     # Save the article to the database
-    save_to_db(article)
 
 
