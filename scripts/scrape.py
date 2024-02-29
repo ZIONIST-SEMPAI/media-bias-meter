@@ -4,10 +4,9 @@ from pynytimes import NYTAPI
 from bs4 import BeautifulSoup
 import yaml
 
-# load environment secrets from .env file
+# loading yml file and setting the variables
 
 
-# retrieve environment variables
 API_KEY = os.getenv("API_KEY")
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
