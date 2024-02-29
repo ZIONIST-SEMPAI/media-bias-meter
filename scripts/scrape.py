@@ -3,11 +3,17 @@ import requests
 from pynytimes import NYTAPI
 from bs4 import BeautifulSoup
 import yaml
+import argparse
+
+parser = argparse.ArgumentParser(description='Program takes a yml file and pulls articles of interest.')
+parser.add_argument('-yml', help='path to yml file.')
+args = parser.parse_args()
 
 # loading yml file and setting the variables
+with open(args.yml) as stream:
+  yml_file = yaml.safe_load(stream)
 
-
-API_KEY = os.getenv("API_KEY")
+API_KEY = yml_file['API_KEY']
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
 DB_USER = os.getenv("DB_USER")
