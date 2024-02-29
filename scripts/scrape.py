@@ -4,9 +4,10 @@ from pynytimes import NYTAPI
 from bs4 import BeautifulSoup
 import yaml
 import argparse
+import datetime
 
 parser = argparse.ArgumentParser(description='Program takes a yml file and pulls articles of interest.')
-parser.add_argument('-yml', help='path to yml file.')
+parser.add_argument('--yml', help='path to yml file.')
 args = parser.parse_args()
 
 # loading yml file and setting the variables
@@ -35,18 +36,26 @@ source    ("The New York Times")
 '''
 
 API_KEY = yml_file['API_KEY']
+begin_date = yml_file['begin_date']
+end_date = yml_file['end_date']
+filter_query = yml_file['filter_query']
 
 
 def get_articles(API_KEY) -> list:
   nyt = NYTAPI(API_KEY, parse_dates=True)
 
   articles = nyt.article_search(
-      results = 10,
-      
-      options = {
+    results = 10,
+    options = {
       "sort": "newest",
-      "fq": "Gaza AND Palestine AND Israel AND Palestinian AND Israeli",
-      })
+      "fq": filter_query
+    },
+    dates = {
+      "begin": datetime.date(year=begin_date[0], month=begin_date[1], day=begin_date[2]),
+      "end": datetime.date(year=end_date[0], month=end_date[1], day=end_date[2])
+    }
+
+  )
 
 
   # New list to hold the extracted info
@@ -62,9 +71,9 @@ def get_articles(API_KEY) -> list:
 
     # Append the extracted information to the new list as a dictionary
     extracted_info.append({'headline': headline_main, 'byline': byline, 'source': source, 'web_url': web_url})
-  
 
   return extracted_info
+
 
 def get_article_content(article_url: str) -> str:
   if not article_url:
@@ -113,6 +122,7 @@ def get_article_content(article_url: str) -> str:
       print("failed: snapshot not found - article has not been archived")
       return "No snapshot found"
 
+
 '''
 def save_to_db(article: dict):
 
@@ -159,7 +169,6 @@ def save_to_db(article: dict):
 
   print(f"Article {article.get('headline')} saved to the database")
 '''
-
 
 
 if __name__ == "__main__":
