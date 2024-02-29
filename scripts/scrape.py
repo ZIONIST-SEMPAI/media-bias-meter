@@ -13,12 +13,29 @@ args = parser.parse_args()
 with open(args.yml) as stream:
   yml_file = yaml.safe_load(stream)
 
+
+# TODO: incorporate the following data structure
+'''
+web_url    string        
+source    string        
+headline            
+    main    string    
+    kicker    string    
+    content_kicker    string    
+    print_headline    string    
+    name    string    
+    seo    string    
+    sub    string    
+pub_date    string        Timestamp (YYYY-MM-DD)
+byline            Author
+news_desk            (OpEd,  Editorial, letters …)
+section_name    Single token        Frontpage or not
+Body            
+source    ("The New York Times")    
+'''
+
 API_KEY = yml_file['API_KEY']
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT")
-DB_USER = os.getenv("DB_USER")
-DB_PASS = os.getenv("DB_PASS")
-DB_NAME = os.getenv("DB_NAME")
+
 
 def get_articles(API_KEY) -> list:
   nyt = NYTAPI(API_KEY, parse_dates=True)
