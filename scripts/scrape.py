@@ -56,8 +56,6 @@ def get_articles(API_KEY) -> list:
     }
 
   )
-
-
   # New list to hold the extracted info
   extracted_info = []
 
