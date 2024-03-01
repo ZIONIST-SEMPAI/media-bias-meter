@@ -15,26 +15,6 @@ with open(args.yml) as stream:
   yml_file = yaml.safe_load(stream)
 
 
-# TODO: incorporate the following data structure
-'''
-web_url    string        
-source    string        
-headline            
-    main    string    
-    kicker    string    
-    content_kicker    string    
-    print_headline    string    
-    name    string    
-    seo    string    
-    sub    string    
-pub_date    string        Timestamp (YYYY-MM-DD)
-byline            Author
-news_desk            (OpEd,  Editorial, letters …)
-section_name    Single token        Frontpage or not
-Body            
-source    ("The New York Times")    
-'''
-
 API_KEY = yml_file['API_KEY']
 begin_date = yml_file['begin_date']
 end_date = yml_file['end_date']
@@ -45,20 +25,38 @@ def get_articles(API_KEY) -> list:
   nyt = NYTAPI(API_KEY, parse_dates=True)
 
   articles = nyt.article_search(
-    results = 10,
-    options = {
+    results=10,
+    options={
       "sort": "newest",
       "fq": filter_query
     },
-    dates = {
+    dates={
       "begin": datetime.date(year=begin_date[0], month=begin_date[1], day=begin_date[2]),
       "end": datetime.date(year=end_date[0], month=end_date[1], day=end_date[2])
     }
-
   )
   # New list to hold the extracted info
   extracted_info = []
 
+  # TODO: incorporate the following data structure
+  '''
+  web_url    string        
+  source    string        
+  headline            
+      main    string    
+      kicker    string    
+      content_kicker    string    
+      print_headline    string    
+      name    string    
+      seo    string    
+      sub    string    
+  pub_date    string        Timestamp (YYYY-MM-DD)
+  byline            Author
+  news_desk            (OpEd,  Editorial, letters …)
+  section_name    Single token        Frontpage or not
+  Body            
+  source    ("The New York Times")    
+  '''
   # Loop through each article in the list
   for article in articles:
     # Extract info from the json
