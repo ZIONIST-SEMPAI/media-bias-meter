@@ -18,12 +18,11 @@ This Python script is designed to scrape articles from The New York Times (NYT) 
 - New York Times(NYT) API-KEY follow this [link](https://developer.nytimes.com/get-started) to get started 
 - .env file under the scripts directory with the following secrets 
 
-```.env
-API_KEY=<NTY-API-KEY>
-DB_HOST=localhost
-DB_USER=<db-username>
-DB_PASS=<db-user-password>
-DB_NAME=media_articles
+```yaml
+API_KEY: GQ2x8SmP1UgAd3UMQV6saK96xUrbrSL6
+begin_date: [2024, 01 ,29]
+end_date: [2024, 02, 11]
+filter_query: Gaza AND Palestine AND Israel AND Palestinian AND Israeli
 ```
 
 ### Installation

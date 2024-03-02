@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import yaml
 import argparse
 import datetime
+import json
 
 parser = argparse.ArgumentParser(description='Program takes a yml file and pulls articles of interest.')
 parser.add_argument('--yml', help='path to yml file.')
@@ -37,7 +38,7 @@ def get_articles(API_KEY) -> list:
   )
   # New list to hold the extracted info
   extracted_info = []
-
+  
   # TODO: incorporate the following data structure
   '''
   web_url    string        
@@ -58,7 +59,7 @@ def get_articles(API_KEY) -> list:
   source    ("The New York Times")    
   '''
   # Loop through each article in the list
-  for article in articles:
+  '''for article in articles:
     # Extract info from the json
     web_url = article.get('web_url', None) 
     source = article.get('source', None)  
@@ -66,7 +67,7 @@ def get_articles(API_KEY) -> list:
     byline = article.get('byline', {}).get('original', None)
 
     # Append the extracted information to the new list as a dictionary
-    extracted_info.append({'headline': headline_main, 'byline': byline, 'source': source, 'web_url': web_url})
+    extracted_info.append({'headline': headline_main, 'byline': byline, 'source': source, 'web_url': web_url})'''
 
   return extracted_info
 
@@ -117,54 +118,6 @@ def get_article_content(article_url: str) -> str:
     else:
       print("failed: snapshot not found - article has not been archived")
       return "No snapshot found"
-
-
-'''
-def save_to_db(article: dict):
-
-  try: 
-    # Connect to the database
-    db = mysql.connector.connect(
-      host=DB_HOST,
-      user=DB_USER,
-      password=DB_PASS,
-      database=DB_NAME
-    )
-    print("Connection established")
-  except mysql.connector.Error as err:
-    print(f"Failed to connect: {err}")
-
-  # Create a cursor
-  cursor = db.cursor()
-
-  # Create a new table
-  create_table = """
-  CREATE TABLE IF NOT EXISTS articles (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    headline VARCHAR(255),
-    byline VARCHAR(255),
-    source VARCHAR(255),
-    web_url TEXT,
-    body TEXT
-  )
-  """
-  cursor.execute(create_table)
-
-  # Prepare the SQL query
-  sql = "INSERT INTO articles (headline, byline, source, web_url, body) VALUES (%s, %s, %s, %s, %s)"
-  values = (article.get('headline'), article.get('byline'), article.get('source'), article.get('web_url'), article.get('body'))
-
-  # Execute the SQL query
-  cursor.execute(sql, values)
-
-  # Commit the changes
-  db.commit()
-
-  # Close the connection
-  db.close()
-
-  print(f"Article {article.get('headline')} saved to the database")
-'''
 
 
 if __name__ == "__main__":

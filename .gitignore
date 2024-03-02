@@ -57,6 +57,7 @@ cover/
 .idea/
 .yml
 .yaml
+.json
 
 # Translations
 *.mo
