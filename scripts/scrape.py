@@ -59,15 +59,26 @@ def get_articles(API_KEY) -> list:
   source    ("The New York Times")    
   '''
   # Loop through each article in the list
-  '''for article in articles:
+  for article in articles:
     # Extract info from the json
     web_url = article.get('web_url', None) 
     source = article.get('source', None)  
     headline_main = article.get('headline', {}).get('main', None)
+    headline_kicker = article.get('headline').get('kicker')
+    headline_content_kicker = article.get('headline').get('content_kicker')
+    headline_print_headline = article.get('headline').get('print_headline')
+    headline_name = article.get('headline').get('name')
+    headline_seo = article.get('headline').get('seo')
+    headline_sub = article.get('headline').get('sub')
+    pub_date = article.get('pub_date')
+    news_desk = article.get('news_desk')
     byline = article.get('byline', {}).get('original', None)
 
     # Append the extracted information to the new list as a dictionary
-    extracted_info.append({'headline': headline_main, 'byline': byline, 'source': source, 'web_url': web_url})'''
+    extracted_info.append({'headline': headline_main,
+                           'byline': byline,
+                           'source': source,
+                           'web_url': web_url})
 
   return extracted_info
 
