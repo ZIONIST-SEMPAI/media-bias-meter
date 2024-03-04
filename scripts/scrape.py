@@ -1,4 +1,3 @@
-import os
 import requests
 from pynytimes import NYTAPI
 from bs4 import BeautifulSoup
