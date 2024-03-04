@@ -1,49 +1,93 @@
-import os
 import requests
-import mysql.connector
 from pynytimes import NYTAPI
 from bs4 import BeautifulSoup
-from dotenv import load_dotenv
+import yaml
+import argparse
+import datetime
+import csv
 
-# load environment secrets from .env file
-load_dotenv()
+parser = argparse.ArgumentParser(description='Program takes a yml file and pulls articles of interest.')
+parser.add_argument('--yml', help='path to yml file.')
+args = parser.parse_args()
 
-# retrieve environment variables
-API_KEY = os.getenv("API_KEY")
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT")
-DB_USER = os.getenv("DB_USER")
-DB_PASS = os.getenv("DB_PASS")
-DB_NAME = os.getenv("DB_NAME")
+# loading yml file and setting the variables
+with open(args.yml) as stream:
+  yml_file = yaml.safe_load(stream)
+
+
+API_KEY = yml_file['API_KEY']
+begin_date = yml_file['begin_date']
+end_date = yml_file['end_date']
+filter_query = yml_file['filter_query']
+
 
 def get_articles(API_KEY) -> list:
   nyt = NYTAPI(API_KEY, parse_dates=True)
 
   articles = nyt.article_search(
-      results = 10,
-      
-      options = {
+    results=10,
+    options={
       "sort": "newest",
-      "fq": "Gaza AND Palestine AND Israel AND Palestinian AND Israeli",
-      })
-
-
+      "fq": filter_query
+    },
+    dates={
+      "begin": datetime.date(year=begin_date[0], month=begin_date[1], day=begin_date[2]),
+      "end": datetime.date(year=end_date[0], month=end_date[1], day=end_date[2])
+    }
+  )
   # New list to hold the extracted info
   extracted_info = []
-
+  
+  '''
+  web_url    string        
+  source    string        
+  headline            
+      main    string    
+      kicker    string    
+      content_kicker    string    
+      print_headline    string    
+      name    string    
+      seo    string    
+      sub    string    
+  pub_date    string        Timestamp (YYYY-MM-DD)
+  byline            Author
+  news_desk            (OpEd,  Editorial, letters …)
+  section_name    Single token        Frontpage or not
+  Body            
+  source    ("The New York Times")    
+  '''
   # Loop through each article in the list
   for article in articles:
     # Extract info from the json
     web_url = article.get('web_url', None) 
     source = article.get('source', None)  
     headline_main = article.get('headline', {}).get('main', None)
+    headline_kicker = article.get('headline').get('kicker')
+    headline_content_kicker = article.get('headline').get('content_kicker')
+    headline_print_headline = article.get('headline').get('print_headline')
+    headline_name = article.get('headline').get('name')
+    headline_seo = article.get('headline').get('seo')
+    headline_sub = article.get('headline').get('sub')
+    pub_date = article.get('pub_date')
+    news_desk = article.get('news_desk')
     byline = article.get('byline', {}).get('original', None)
 
     # Append the extracted information to the new list as a dictionary
-    extracted_info.append({'headline': headline_main, 'byline': byline, 'source': source, 'web_url': web_url})
-  
+    extracted_info.append({'headline': headline_main,
+                           'byline': byline,
+                           'source': source,
+                           'web_url': web_url,
+                           'headline-kicker': headline_kicker,
+                           'headline-content-kicker': headline_content_kicker,
+                           'headline-print-headline': headline_print_headline,
+                           'headline-name': headline_name,
+                           'headline-seo': headline_seo,
+                           'headline-sub': headline_sub,
+                           'pub_date': pub_date,
+                           'news-desk': news_desk})
 
   return extracted_info
+
 
 def get_article_content(article_url: str) -> str:
   if not article_url:
@@ -92,53 +136,6 @@ def get_article_content(article_url: str) -> str:
       print("failed: snapshot not found - article has not been archived")
       return "No snapshot found"
 
-def save_to_db(article: dict):
-
-  try: 
-    # Connect to the database
-    db = mysql.connector.connect(
-      host=DB_HOST,
-      user=DB_USER,
-      password=DB_PASS,
-      database=DB_NAME
-    )
-    print("Connection established")
-  except mysql.connector.Error as err:
-    print(f"Failed to connect: {err}")
-
-  # Create a cursor
-  cursor = db.cursor()
-
-  # Create a new table
-  create_table = """
-  CREATE TABLE IF NOT EXISTS articles (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    headline VARCHAR(255),
-    byline VARCHAR(255),
-    source VARCHAR(255),
-    web_url TEXT,
-    body TEXT
-  )
-  """
-  cursor.execute(create_table)
-
-  # Prepare the SQL query
-  sql = "INSERT INTO articles (headline, byline, source, web_url, body) VALUES (%s, %s, %s, %s, %s)"
-  values = (article.get('headline'), article.get('byline'), article.get('source'), article.get('web_url'), article.get('body'))
-
-  # Execute the SQL query
-  cursor.execute(sql, values)
-
-  # Commit the changes
-  db.commit()
-
-  # Close the connection
-  db.close()
-
-  print(f"Article {article.get('headline')} saved to the database")
-
-
-
 
 if __name__ == "__main__":
 
@@ -149,7 +146,13 @@ if __name__ == "__main__":
     # Get the article content
     article["body"] = get_article_content(article.get('web_url'))
 
-    # Save the article to the database
-    save_to_db(article)
+  header = ['headline', 'byline', 'source', 'web_url', 'headline-kicker','headline-content-kicker',
+            'headline-print-headline', 'headline-name', 'headline-seo', 'headline-sub', 'pub_date',
+            'news-desk', 'body']
 
+  # Save the article to a csv file
+  with open('articles.csv', 'w') as csvfile:
+    writer = csv.DictWriter(csvfile, fieldnames= header)
+    writer.writeheader()
+    writer.writerows(articles)
 
