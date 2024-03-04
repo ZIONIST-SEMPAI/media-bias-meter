@@ -58,6 +58,7 @@ cover/
 .yml
 .yaml
 .json
+.csv
 
 # Translations
 *.mo

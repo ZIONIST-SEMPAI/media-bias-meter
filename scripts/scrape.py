@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import yaml
 import argparse
 import datetime
-import json
+import csv
 
 parser = argparse.ArgumentParser(description='Program takes a yml file and pulls articles of interest.')
 parser.add_argument('--yml', help='path to yml file.')
@@ -39,7 +39,6 @@ def get_articles(API_KEY) -> list:
   # New list to hold the extracted info
   extracted_info = []
   
-  # TODO: incorporate the following data structure
   '''
   web_url    string        
   source    string        
@@ -78,7 +77,15 @@ def get_articles(API_KEY) -> list:
     extracted_info.append({'headline': headline_main,
                            'byline': byline,
                            'source': source,
-                           'web_url': web_url})
+                           'web_url': web_url,
+                           'headline-kicker': headline_kicker,
+                           'headline-content-kicker': headline_content_kicker,
+                           'headline-print-headline': headline_print_headline,
+                           'headline-name': headline_name,
+                           'headline-seo': headline_seo,
+                           'headline-sub': headline_sub,
+                           'pub_date': pub_date,
+                           'news-desk': news_desk})
 
   return extracted_info
 
@@ -140,6 +147,13 @@ if __name__ == "__main__":
     # Get the article content
     article["body"] = get_article_content(article.get('web_url'))
 
-    # Save the article to the database
+  header = ['headline', 'byline', 'source', 'web_url', 'headline-kicker','headline-content-kicker',
+            'headline-print-headline', 'headline-name', 'headline-seo', 'headline-sub', 'pub_date',
+            'news-desk', 'body']
 
+  # Save the article to a csv file
+  with open('articles.csv', 'w') as csvfile:
+    writer = csv.DictWriter(csvfile, fieldnames= header)
+    writer.writeheader()
+    writer.writerows(articles)
 
